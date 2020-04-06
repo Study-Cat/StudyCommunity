@@ -40,18 +40,18 @@
                         </a>
                     </li>
                     <li th:if="${pageInfoSelf.getPages()<=10}" th:each="i:${#numbers.sequence(1,pageInfoSelf.getPages())}">
-                        <a th:href="@{'index?pageNum='+${i}}">[[${i}]]</a></li>
+                        <a th:href="@{'/profile/'+${section}(pageNum=${i})}">[[${i}]]</a></li>
                     </li>
                     <li th:if="${pageInfoSelf.getPages()>10}" th:each="i:${#numbers.sequence(1,10)}">
-                        <a th:href="@{'index?pageNum='+${i}}">[[${i}]]</a></li>
+                        <a th:href="@{'/profile/'+${section}(pageNum=${i})}">[[${i}]]</a></li>
                     </li>
                     <li>
-                        <a aria-label="Next" th:href="@{/index(pageNum=${pageInfoSelf.getNextPage()})}">
+                        <a aria-label="Next" th:href="@{'/profile/'+${section}(pageNum=${pageInfoSelf.getNextPage()})}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                     <li th:if="${pageInfoSelf.getPages()>10}">
-                        <form action="/" method="get" style="float: left;"><h4>跳转到<input name="pageNum" type="text" style="width: 30px;"/> <button type="submit" class="btn btn-default">跳转</button> </h4> </form>
+                        <form th:action="/profile/${section}" method="get" style="float: left;"><h4>跳转到<input name="pageNum" type="text" style="width: 30px;"/> <button type="submit" class="btn btn-default">跳转</button> </h4> </form>
                     </li>
 
                 </ul>

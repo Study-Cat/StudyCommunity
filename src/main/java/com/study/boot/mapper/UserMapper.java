@@ -21,6 +21,6 @@ public interface UserMapper {
 
 
 
-    @Update("update user set token = #{user.getToken} where account_id = user.getAccountId")
+    @Update("update user set token = #{token} where account_id = #{accountId}")
     void update(User user);
 }

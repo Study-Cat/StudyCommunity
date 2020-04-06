@@ -25,6 +25,10 @@ public class ProfileController {
                           @RequestParam(defaultValue = "10") int pageSize,
                           HttpServletRequest request,
                           Model model){
+        User user = (User)request.getSession().getAttribute("user");
+        if(user ==null){
+            return "redirect:/";
+        }
         if("questions".contains(action)){
             model.addAttribute("section", "questions");
             model.addAttribute("sectionName","我的问题");
@@ -33,7 +37,6 @@ public class ProfileController {
             model.addAttribute("section", "replies");
             model.addAttribute("sectionName","我的回复");
         }
-        User user = (User)request.getSession().getAttribute("user");
         PageHelper.startPage(pageNum,pageSize);
         PageInfo<QuestionUser> pageInfo = new PageInfo(questionMapper.listByUserId(Integer.parseInt(user.getAccountId())));
         model.addAttribute("pageInfoSelf",pageInfo);
