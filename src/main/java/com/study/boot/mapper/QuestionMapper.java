@@ -24,7 +24,11 @@ public interface QuestionMapper{
             @Result(column = "view_count",property = "viewCount"),
             @Result(column = "like_count",property = "likeCount"),
             @Result(column = "tag",property = "tag"),
-            @Result(column = "creator",property = "user",one=@One(select = "com.study.boot.mapper.UserMapper.findById",fetchType = FetchType.EAGER)),
+            @Result(column = "creator",property = "user",one=@One(select = "com.study.boot.mapper.UserMapper.findById",fetchType = FetchType.EAGER))
     })
     List<QuestionUser> list();
+
+    @Select("select * from question where creator =#{id}")
+    @ResultMap(value = {"questionMap"})
+    List<QuestionUser> listByUserId(@Param("id") int id);
 }
