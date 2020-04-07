@@ -25,7 +25,7 @@
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading">[[${question.title}]]</h4>
+                    <h4 class="media-heading"><a th:href="@{'/question/'+${question.id}}">[[${question.title}]]</a></h4>
                     <span>[[${question.description}]]</span>
                     <br/>
                     <span class="text-desc">[[${question.CommentCount}]]个回复,[[${question.viewCount}]]次浏览,[[${question.likeCount}]]个喜欢</span>

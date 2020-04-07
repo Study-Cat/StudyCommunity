@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="alert alert-warning alert-dismissible" role="alert" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>警告!</strong> 非法查询！
+</div>
+</body>
+</html>

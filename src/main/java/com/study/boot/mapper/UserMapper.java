@@ -8,7 +8,9 @@ public interface UserMapper {
     @Select("select * from user where account_id = #{accountId}")
     @Results(id="userMap",value = {
             @Result(column = "avatar_url",property = "avatarUrl"),
-            @Result(column = "account_id",property = "accountId")
+            @Result(column = "account_id",property = "accountId"),
+            @Result(column = "gmt_create",property = "gmtCreate"),
+            @Result(column = "gmt_modified",property = "gmtModified"),
     })
     User findById(@Param("accountId") String accountId);
 

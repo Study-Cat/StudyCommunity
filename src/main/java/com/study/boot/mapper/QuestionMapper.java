@@ -1,9 +1,11 @@
 package com.study.boot.mapper;
 
+import com.study.boot.dto.QuestionDTO;
 import com.study.boot.model.Question;
 import com.study.boot.model.QuestionUser;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -31,4 +33,14 @@ public interface QuestionMapper{
     @Select("select * from question where creator =#{id}")
     @ResultMap(value = {"questionMap"})
     List<QuestionUser> listByUserId(@Param("id") int id);
+
+    @Select("select * from question where id = #{id}")
+    @ResultMap("questionMap")
+    QuestionUser getById(@Param("id") Integer id);
+
+    @Select("select * from question where id =#{id}")
+    Question getByIdUpdate(@Param("id") Integer id);
+
+    @Update("update question set title=#{title},description=#{description},gmt_create=#{gmtCreate},gmt_modified=#{gmtModified},creator=#{creator},tag=#{tag} where id =#{id}")
+    void setByIdUpdate(Question question);
 }
