@@ -40,7 +40,7 @@ public class PublishController {
            }
        }else{
            model.addAttribute("msg","查询不合法！");
-           return "error";
+           return "/error/error";
        }
        return "publish";
     }

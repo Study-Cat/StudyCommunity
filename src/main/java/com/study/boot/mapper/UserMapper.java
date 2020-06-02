@@ -21,8 +21,6 @@ public interface UserMapper {
     @Insert("insert into user(name,account_id,token,gmt_create,gmt_modified,avatar_url) values (#{name},#{accountId},#{token},#{gmtCreate},#{gmtModified},#{avatarUrl})")
     void insert(User user);
 
-
-
     @Update("update user set token = #{token} where account_id = #{accountId}")
     void update(User user);
 }

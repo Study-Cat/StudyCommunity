@@ -1,11 +1,9 @@
 package com.study.boot.mapper;
 
-import com.study.boot.dto.QuestionDTO;
 import com.study.boot.model.Question;
 import com.study.boot.model.QuestionUser;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -36,11 +34,20 @@ public interface QuestionMapper{
 
     @Select("select * from question where id = #{id}")
     @ResultMap("questionMap")
-    QuestionUser getById(@Param("id") Integer id);
+    QuestionUser getById(@Param("id") Long id);
 
     @Select("select * from question where id =#{id}")
     Question getByIdUpdate(@Param("id") Integer id);
 
     @Update("update question set title=#{title},description=#{description},gmt_create=#{gmtCreate},gmt_modified=#{gmtModified},creator=#{creator},tag=#{tag} where id =#{id}")
     void setByIdUpdate(Question question);
+
+    @Update("update question set view_count = view_count+1 where id = #{id}")
+    void incView(@Param("id") Long id);
+
+    @Select("select * from question where id= #{parentId}")
+    Question selectByPrimaryKey(Long parentId);
+
+    @Update("update question set comment_count = comment_count+1 where id = #{id}")
+    int incCommentCount(@Param("id") Integer id);
 }

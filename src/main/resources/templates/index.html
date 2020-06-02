@@ -10,6 +10,16 @@
     <link rel="stylesheet" href="css/community.css">
     <script src="bootstrap/js/bootstrap.min.js" type="application/javascript"></script>
 </head>
+<script type="application/javascript">
+    window.onload = function(){
+        debugger;
+        var closable = window.localStorage.getItem("closable");
+        if(closable == "true"){
+            window.close();
+            window.localStorage.removeItem("closable");
+        }
+    }
+</script>
 <body>
 <div th:insert="~{navgation::navcopy}"></div>
 <div class="container-fluid main">
@@ -70,4 +80,5 @@
     </div>
 </div>
 </body>
+
 </html>
