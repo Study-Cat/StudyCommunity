@@ -3,6 +3,7 @@ package com.study.boot.dto;
 import com.study.boot.model.User;
 import lombok.Data;
 
+
 @Data
 public class CommentDTO {
     private Long id;

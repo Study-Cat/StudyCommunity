@@ -1,6 +1,7 @@
 package com.study.boot.advice;
 
 import com.alibaba.fastjson.JSON;
+
 import com.study.boot.dto.ResultDTO;
 import com.study.boot.exception.CustomizeErrorCode;
 import com.study.boot.exception.CustomizeException;
@@ -14,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 
 @ControllerAdvice
 @Slf4j

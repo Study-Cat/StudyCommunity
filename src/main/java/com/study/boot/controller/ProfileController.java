@@ -1,45 +1,49 @@
 package com.study.boot.controller;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.study.boot.mapper.QuestionMapper;
-import com.study.boot.model.QuestionUser;
+import com.study.boot.dto.PaginationDTO;
 import com.study.boot.model.User;
+import com.study.boot.service.NotificationService;
+import com.study.boot.service.QuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 
 @Controller
 public class ProfileController {
-    @Resource
-    private QuestionMapper questionMapper;
-    @GetMapping("profile/{action}")
-    public String profile(@PathVariable("action") String action,
-                          @RequestParam(defaultValue = "1") int pageNum,
-                          @RequestParam(defaultValue = "10") int pageSize,
-                          HttpServletRequest request,
-                          Model model){
-        User user = (User)request.getSession().getAttribute("user");
-        if(user ==null){
+    @Autowired
+    private QuestionService questionService;
+    @Autowired
+    private NotificationService notificationService;
+
+    @GetMapping("/profile/{action}")
+    public String profile(HttpServletRequest request,
+                          @PathVariable(name = "action") String action,
+                          Model model,
+                          @RequestParam(name = "page", defaultValue = "1") Integer page,
+                          @RequestParam(name = "size", defaultValue = "5") Integer size) {
+
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
             return "redirect:/";
         }
-        if("questions".contains(action)){
+
+        if ("questions".equals(action)) {
             model.addAttribute("section", "questions");
-            model.addAttribute("sectionName","我的问题");
-        }
-        if("replies".contains(action)){
+            model.addAttribute("sectionName", "我的提问");
+            PaginationDTO paginationDTO = questionService.list(user.getId(), page, size);
+            model.addAttribute("pagination", paginationDTO);
+        } else if ("replies".equals(action)) {
+            PaginationDTO paginationDTO = notificationService.list(user.getId(), page, size);
             model.addAttribute("section", "replies");
-            model.addAttribute("sectionName","我的回复");
+            model.addAttribute("pagination", paginationDTO);
+            model.addAttribute("sectionName", "最新回复");
         }
-        PageHelper.startPage(pageNum,pageSize);
-        PageInfo<QuestionUser> pageInfo = new PageInfo(questionMapper.listByUserId(Integer.parseInt(user.getAccountId())));
-        model.addAttribute("pageInfoSelf",pageInfo);
         return "profile";
     }
 }

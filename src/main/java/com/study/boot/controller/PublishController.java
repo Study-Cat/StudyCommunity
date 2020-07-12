@@ -1,9 +1,12 @@
 package com.study.boot.controller;
 
-import com.study.boot.mapper.QuestionMapper;
+import com.study.boot.cache.TagCache;
+import com.study.boot.dto.QuestionDTO;
 import com.study.boot.model.Question;
-import com.study.boot.model.QuestionUser;
 import com.study.boot.model.User;
+import com.study.boot.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,73 +14,80 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Resource;
-import javax.jws.WebParam;
+import javax.annotation.security.DeclareRoles;
 import javax.servlet.http.HttpServletRequest;
+
 
 @Controller
 public class PublishController {
 
-    @Resource
-    private QuestionMapper questionMapper;
+    @Autowired
+    private QuestionService questionService;
 
-    @GetMapping("/publish")
-    public String toPublish(){
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable(name = "id") Long id,
+                       Model model) {
+        QuestionDTO question = questionService.getById(id);
+        model.addAttribute("title", question.getTitle());
+        model.addAttribute("description", question.getDescription());
+        model.addAttribute("tag", question.getTag());
+        model.addAttribute("id", question.getId());
+        model.addAttribute("tags", TagCache.get());
         return "publish";
     }
 
-    @GetMapping("/publish/{id}")
-    public String toUpdate(@PathVariable("id") Integer id,Model model,HttpServletRequest request){
-       QuestionUser questionUser = questionMapper.getById(id);
-       User user = (User) request.getSession().getAttribute("user");
-       //判断传过来的id是否是所登陆用的问题id，避免修改其他用户的问题id
-       if (questionUser.getUser() !=null){
-           if(user.getAccountId() == questionUser.getUser().getAccountId()){
-               model.addAttribute("title",questionUser.getTitle());
-               model.addAttribute("description",questionUser.getDescription());
-               model.addAttribute("tag",questionUser.getTag());
-               model.addAttribute("id",id);
-           }
-       }else{
-           model.addAttribute("msg","查询不合法！");
-           return "/error/error";
-       }
-       return "publish";
+
+    @GetMapping("/publish")
+    public String publish(Model model) {
+        model.addAttribute("tags", TagCache.get());
+        return "publish";
     }
+
     @PostMapping("/publish")
     public String doPublish(
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("tag") String tag,
-            @RequestParam(value = "id",required = false) Integer id,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "tag", required = false) String tag,
+            @RequestParam(value = "id", required = false) Long id,
             HttpServletRequest request,
-            Model model
-    ){
-        model.addAttribute("title",title);
-        model.addAttribute("description",description);
-        model.addAttribute("tag",tag);
-        User user = (User)request.getSession().getAttribute("user");
-        if(user == null){
-            model.addAttribute("error","用户未登录");
+            Model model) {
+        model.addAttribute("title", title);
+        model.addAttribute("description", description);
+        model.addAttribute("tag", tag);
+        model.addAttribute("tags", TagCache.get());
+
+        if (StringUtils.isBlank(title)) {
+            model.addAttribute("error", "标题不能为空");
             return "publish";
         }
-        if(title == null || description ==null || tag==null || title =="" || description == "" || tag ==""){
-            model.addAttribute("error","标题、内容、标签不能为空！");
+        if (StringUtils.isBlank(description)) {
+            model.addAttribute("error", "问题补充不能为空");
             return "publish";
         }
+        if (StringUtils.isBlank(tag)) {
+            model.addAttribute("error", "标签不能为空");
+            return "publish";
+        }
+
+        String invalid = TagCache.filterInvalid(tag);
+        if (StringUtils.isNotBlank(invalid)) {
+            model.addAttribute("error", "输入非法标签:" + invalid);
+            return "publish";
+        }
+
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            model.addAttribute("error", "用户未登录");
+            return "publish";
+        }
+
         Question question = new Question();
         question.setTitle(title);
         question.setDescription(description);
         question.setTag(tag);
-        question.setCreator(Integer.parseInt(user.getAccountId()));
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
+        question.setCreator(user.getId());
         question.setId(id);
-        if(id == null){
-            questionMapper.create(question);
-        }else {
-            questionMapper.setByIdUpdate(question);
-        }
+        questionService.createOrUpdate(question);
         return "redirect:/";
     }
 }

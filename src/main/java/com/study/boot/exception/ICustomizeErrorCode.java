@@ -1,6 +1,7 @@
 package com.study.boot.exception;
 
+
 public interface ICustomizeErrorCode {
-    String getMessage();
+    String getMessage() ;
     Integer getCode();
 }

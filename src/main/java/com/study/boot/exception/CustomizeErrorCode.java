@@ -1,6 +1,8 @@
 package com.study.boot.exception;
 
-public enum  CustomizeErrorCode implements ICustomizeErrorCode{
+
+public enum CustomizeErrorCode implements ICustomizeErrorCode {
+
     QUESTION_NOT_FOUND(2001, "你找到问题不在了，要不要换个试试？"),
     TARGET_PARAM_NOT_FOUND(2002, "未选中任何问题或评论进行回复"),
     NO_LOGIN(2003, "当前操作需要登录，请登陆后重试"),
@@ -14,17 +16,20 @@ public enum  CustomizeErrorCode implements ICustomizeErrorCode{
     INVALID_INPUT(2011, "非法输入"),
     INVALID_OPERATION(2012, "兄弟，是不是走错房间了？"),
     ;
-    private String message;
-    private Integer code;
 
     @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public Integer getCode() {
         return code;
     }
+
+    private Integer code;
+    private String message;
+
     CustomizeErrorCode(Integer code, String message) {
         this.message = message;
         this.code = code;

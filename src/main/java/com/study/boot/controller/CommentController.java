@@ -1,41 +1,57 @@
 package com.study.boot.controller;
 
 import com.study.boot.dto.CommentCreateDTO;
+import com.study.boot.dto.CommentDTO;
 import com.study.boot.dto.ResultDTO;
+import com.study.boot.enums.CommentTypeEnum;
 import com.study.boot.exception.CustomizeErrorCode;
-import com.study.boot.mapper.CommentMapper;
 import com.study.boot.model.Comment;
 import com.study.boot.model.User;
 import com.study.boot.service.CommentService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
-@RestController
+
+@Controller
 public class CommentController {
+
     @Autowired
     private CommentService commentService;
-    @Resource
-    private CommentMapper commentMapper;
-    @RequestMapping("/comment")
+
+    @ResponseBody
+    @RequestMapping(value = "/comment", method = RequestMethod.POST)
     public Object post(@RequestBody CommentCreateDTO commentCreateDTO,
-                       HttpServletRequest request){
-        User user = (User)request.getSession().getAttribute("user");
-        if(user == null){
+                       HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
             return ResultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
         }
+
+        if (commentCreateDTO == null || StringUtils.isBlank(commentCreateDTO.getContent())) {
+            return ResultDTO.errorOf(CustomizeErrorCode.CONTENT_IS_EMPTY);
+        }
+
         Comment comment = new Comment();
         comment.setParentId(commentCreateDTO.getParentId());
         comment.setContent(commentCreateDTO.getContent());
         comment.setType(commentCreateDTO.getType());
         comment.setGmtModified(System.currentTimeMillis());
         comment.setGmtCreate(System.currentTimeMillis());
-        comment.setCommentator((long) 5);
-        commentService.insert(comment);
+        comment.setCommentator(user.getId());
+        comment.setLikeCount(0L);
+        commentService.insert(comment, user);
         return ResultDTO.okOf();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment/{id}", method = RequestMethod.GET)
+    public ResultDTO<List<CommentDTO>> comments(@PathVariable(name = "id") Long id) {
+        List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.COMMENT);
+        return ResultDTO.okOf(commentDTOS);
     }
 }

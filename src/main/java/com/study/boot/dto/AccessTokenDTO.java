@@ -2,6 +2,7 @@ package com.study.boot.dto;
 
 import lombok.Data;
 
+
 @Data
 public class AccessTokenDTO {
     private String client_id;
